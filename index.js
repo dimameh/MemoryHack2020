@@ -8,9 +8,9 @@ app.listen((process.env.PORT || 3000), function () {
 
 app.get('/', async (req, res) => {
     try {
-        var array = fs.readFileSync('./images/links.txt').toString().split("\n");   
-
-        res.send(array);
+        let file = fs.readFileSync('./images/links.json');
+        let object = JSON.parse(file);
+        res.send(object);
     } catch (e) {
         res.status(404);
         res.send('File not found!');
