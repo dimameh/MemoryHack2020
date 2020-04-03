@@ -9,9 +9,7 @@ app.listen((process.env.PORT || 3000), function () {
 app.get('/', async (req, res) => {
     try {
         var array = fs.readFileSync('./images/links.txt').toString().split("\n");   
-        for(var i = 0; i < array.length-1; i++){
-            array[i] = array[i].substr(0, array[i].length-1);
-        }
+
         res.send(array);
     } catch (e) {
         res.status(404);
