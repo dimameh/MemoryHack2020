@@ -6,7 +6,7 @@ app.listen(3000, function () {
   console.log('Listening on port 3000!');
 });
 
-app.get('/getFiveImages', async (req, res) => {
+app.get('/', async (req, res) => {
     try {
         var array = fs.readFileSync('./images/links.txt').toString().split("\n");   
         for(var i = 0; i < array.length-1; i++){
