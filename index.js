@@ -74,7 +74,7 @@ app.get('/photo/:name', function(req, res) {
 });
 
 //Требуется для дебага
-app.get('/clearPhotos', function(rea, res) {
+app.get('/removePhotos', function(rea, res) {
     const directory = 'photos';
 
     fs.readdir(directory, (err, files) => {
