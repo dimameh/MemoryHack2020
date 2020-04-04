@@ -7,7 +7,7 @@ const connectToDb = async () => {
     await Mongoose.connect(config.MONGO_URI, { useNewUrlParser: true });
     console.log('Connected to mongo!!!');
   } catch (err) {
-    console.log('Could not connect to MongoDB');
+    console.log('Could not connect to MongoDB- ' + err);
   }
 };
 
