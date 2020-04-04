@@ -8,6 +8,7 @@ const fs = require('fs'),
     photoInfoController = require('./controllers/photoInfo.controller').controller,
     nameGenerator = require('./photoNameGenerator');
     path = require('path');
+    validator = require('./validator')
 
 
 app.use('/public', express.static(__dirname + '/public'));  
@@ -32,26 +33,34 @@ app.get('/', async (req, res) => {
 });
 
 app.post('/uploadPhoto', function(req, res) {
-    if(req.files){
-        var file = req.files.filename;
-        var filename = nameGenerator.GenerateName(file.name);
-        var userId = req.body.vkUserId;
-        if (!fs.existsSync(config.photoDir)) {
-            fs.mkdirSync(config.photoDir);
-        }
-        file.mv(config.photoDir + filename, function(err) {
-            if(err){
-                console.log(err);
-                res.send('error with upload photo');
-            } else {
-                try {
-                    photoInfoController.addPhotoInfo(filename, userId);
-                    res.send(`Success! filePath: [${filename}]`);
-                } catch (err) {
-                    res.send('db error- ' + err);
-                }                
+    if (req.files) {
+        if (!validator.isValidPhotoInfoData(req.body)) {
+            res.send('Data is not valid: ');
+            console.log(req.body);
+        } else {
+            var file = req.files.filename;
+            var filename = nameGenerator.GenerateName(file.name);
+            var userId = req.body.vkUserId;
+            if (!fs.existsSync(config.photoDir)) {
+                fs.mkdirSync(config.photoDir);
             }
-        });
+            file.mv(config.photoDir + filename, function(err) {
+                if (err) {
+                    console.log(err);
+                    res.send('error with upload photo');
+                } else {
+                    try {
+                        data = req.body;
+                        data.photoName = filename;
+                        console.log(data);
+                        photoInfoController.addPhotoInfo(data);
+                        res.send(`Success! filePath: [${data}]`);
+                    } catch (err) {
+                        res.send('db error- ' + err);
+                    }                
+                }
+            });
+        }
     }
 });
 
@@ -72,6 +81,18 @@ app.get('/test', function(req, res) {
 
 app.get('/photo/:name', function(req, res) {
     res.sendFile(__dirname + config.photoDir.substr(1, config.photoDir.length) + req.params.name);
+});
+
+app.get('/getUserPhoto', function(req, res) {
+    var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+
+    fullUrl = fullUrl.substr(0, fullUrl.length - 9);
+    photoInfoController.getUsersPhoto(req.body.vkUserId).then(result => {
+        result.forEach(element => {
+            element.photoName = fullUrl + 'photo/' + element.photoName
+        });
+        res.send(result);
+    })
 });
 
 //Требуется для дебага

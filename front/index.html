@@ -4,9 +4,22 @@
 
 <form method="post" enctype="multipart/form-data" action="/uploadPhoto">
     <input type="number" name="vkUserId">
+    <input type="text" name="name">
+    <input type="text" name="surname">
+    <input type="number" name="birthYear">
+    <input type="number" name="deathYear">
+    <input type="text" name="bio">
     <input type="file" name="filename">
     <input type="submit" value="upload">
 </form>
+
+
+        vkUserId
+        name
+        surname
+        birthYear
+        deathYear
+        bio
 
 <form method="get" action="/getPhoto">
     <input type="submit" value="Get URL">
@@ -14,4 +27,9 @@
 
 <form method="get" action="/removePhoto">
     <input type="submit" value="Remove photo">
+</form>
+
+<form method="get" action="/getUserPhoto">
+    <input type="number" name="vkUserId">
+    <input type="submit" value="Get users photo">
 </form>
