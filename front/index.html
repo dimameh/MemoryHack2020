@@ -3,14 +3,15 @@
 </h1>
 
 <form method="post" enctype="multipart/form-data" action="/uploadPhoto">
+    <input type="number" name="vkUserId">
     <input type="file" name="filename">
     <input type="submit" value="upload">
 </form>
 
-<form method="get" action="/getPhotos">
+<form method="get" action="/getPhoto">
     <input type="submit" value="Get URL">
 </form>
 
-<form method="get" action="/removePhotos">
-    <input type="submit" value="Remove photos">
+<form method="get" action="/removePhoto">
+    <input type="submit" value="Remove photo">
 </form>

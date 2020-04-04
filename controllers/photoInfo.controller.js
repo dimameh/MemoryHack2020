@@ -1,21 +1,22 @@
-const PhotoInfo = require('../models/photoInfo.model').photoModel;
+const PhotoInfo = require('../models/photoInfo.model').photoInfoModel;
 
 const controller = {};
 
-controller.addPhoto = async (photoName) => {
+controller.addPhotoInfo = async (photoName, vkUserId) => {
     const photoToAdd = PhotoInfo({
-        photoName
+        photoName,
+        vkUserId
     });
     try {
-        await PhotoInfo.addPhoto(photoToAdd);
-        console.log('Adding new photo... ');
+        await PhotoInfo.addPhotoInfo(photoToAdd);
+        console.log('Adding new photo info... ');
     } catch (err) {
-        throw `Error in add photo- ${err}`;
+        throw `Error in add photo info- ${err}`;
     }
   };
 
-controller.getPhotos = async function () {
-    return await PhotoInfo.getPhotos();
+controller.getPhotoInfo = async function () {
+    return await PhotoInfo.getPhotoInfo();
 }
 
 controller.removeAll = async function () {

@@ -5,7 +5,7 @@ const fs = require('fs'),
     config = require('./config').config,
     connect = require('./db/connect'),
     upload = require('express-fileupload');
-    photoController = require('./controllers/photoInfo.controller').controller,
+    photoInfoController = require('./controllers/photoInfo.controller').controller,
     nameGenerator = require('./photoNameGenerator');
     path = require('path');
 
@@ -33,31 +33,32 @@ app.get('/', async (req, res) => {
 
 app.post('/uploadPhoto', function(req, res) {
     if(req.files){
-        var file = req.files.filename,
-            filename = nameGenerator.GenerateName(file.name);
-            if (!fs.existsSync(config.photoDir)){
-                fs.mkdirSync(config.photoDir);
-}
-            file.mv(config.photoDir + filename, function(err){
-                if(err){
-                    console.log(err);
-                    res.send('error with upload photo');
-                } else {
-                    try {
-                        photoController.addPhoto(filename);
-                        res.send(`Success! filePath: [${filename}]`);
-                    } catch (err) {
-                        res.send('db error- ' + err);
-                    }                
-                }
-            });
+        var file = req.files.filename;
+        var filename = nameGenerator.GenerateName(file.name);
+        var userId = req.body.vkUserId;
+        if (!fs.existsSync(config.photoDir)) {
+            fs.mkdirSync(config.photoDir);
+        }
+        file.mv(config.photoDir + filename, function(err) {
+            if(err){
+                console.log(err);
+                res.send('error with upload photo');
+            } else {
+                try {
+                    photoInfoController.addPhotoInfo(filename, userId);
+                    res.send(`Success! filePath: [${filename}]`);
+                } catch (err) {
+                    res.send('db error- ' + err);
+                }                
+            }
+        });
     }
 });
 
-app.get('/getPhotos',function(req, res) {
+app.get('/getPhoto',function(req, res) {
     var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
     fullUrl = fullUrl.substr(0, fullUrl.length - 9);
-    photoController.getPhotos().then(result => {
+    photoInfoController.getPhotoInfo().then(result => {
         result.forEach(element => {
             element.photoName = fullUrl + 'photo/' + element.photoName
         });
@@ -74,8 +75,8 @@ app.get('/photo/:name', function(req, res) {
 });
 
 //Требуется для дебага
-app.get('/removePhotos', function(rea, res) {
-    const directory = 'photos';
+app.get('/removePhoto', function(rea, res) {
+    const directory = 'photo';
 
     fs.readdir(directory, (err, files) => {
         if (err) {
@@ -90,7 +91,7 @@ app.get('/removePhotos', function(rea, res) {
             }
         }
     });
-    photoController.removeAll();
+    photoInfoController.removeAll();
     console.log('all photo has been removed');
     res.send('all photo has been removed');
 });

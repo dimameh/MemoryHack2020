@@ -1,15 +1,18 @@
 const mongoose = require('mongoose');
 
-const PhotoSchema = mongoose.Schema({
+const PhotoInfoSchema = mongoose.Schema({
   photoName: { type: String, required: true, unique: true },
-}, { collection: 'photos' });
+  vkUserId: { type: Number, required: true },
+}, { collection: 'photoInfo' });
 
-const PhotoModel = mongoose.model('photos', PhotoSchema);
+const PhotoInfoModel = mongoose.model('photoInfo', PhotoInfoSchema);
 
-PhotoModel.addPhoto = (photoToAdd) => photoToAdd.save();
+PhotoInfoModel.addPhotoInfo = (photoInfoToAdd) => photoInfoToAdd.save();
 
-PhotoModel.getPhotos = () => PhotoModel.find({ }, '-__v -_id');
+PhotoInfoModel.getPhotoInfo = () => PhotoInfoModel.find({ }, '-__v -_id');
 
-PhotoModel.removeAll = () => PhotoModel.remove({});
+// PhotoInfoModel.getUsersPhoto
 
-exports.photoModel = PhotoModel;
+PhotoInfoModel.removeAll = () => PhotoInfoModel.remove({});
+
+exports.photoInfoModel = PhotoInfoModel;
