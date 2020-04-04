@@ -33,6 +33,7 @@ app.get('/', async (req, res) => {
 });
 
 app.post('/uploadPhoto', function(req, res) {
+    console.log({query: req.query, body: req.body, files: req.files, file: req.file, type: typeof(req.files.filename.data)});
     if (req.files) {
         if (!validator.isValidPhotoInfoData(req.body)) {
             res.send('Data is not valid');
