@@ -6,10 +6,10 @@ const fs = require('fs'),
     connect = require('./db/connect'),
     upload = require('express-fileupload');
     photoInfoController = require('./controllers/photoInfo.controller').controller,
-    nameGenerator = require('./photoNameGenerator');
-    path = require('path');
-    validator = require('./validator')
-
+    nameGenerator = require('./photoNameGenerator'),
+    path = require('path'),
+    validator = require('./validator'),
+    translit = require('cyrillic-to-translit-js');
 
 app.use('/public', express.static(__dirname + '/public'));  
 app.use(express.static(__dirname + '/public')); 
@@ -38,7 +38,7 @@ app.post('/uploadPhoto', function(req, res) {
             res.send('Data is not valid');
         } else {
             var file = req.files.filename;
-            var filename = nameGenerator.GenerateName(file.name);
+            var filename = translit().transform(nameGenerator.GenerateName(file.name));
             if (!fs.existsSync(config.photoDir)) {
                 fs.mkdirSync(config.photoDir);
             }
