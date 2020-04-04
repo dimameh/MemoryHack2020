@@ -35,6 +35,9 @@ app.post('/uploadPhoto', function(req, res) {
     if(req.files){
         var file = req.files.filename,
             filename = nameGenerator.GenerateName(file.name);
+            if (!fs.existsSync(config.photoDir)){
+                fs.mkdirSync(config.photoDir);
+}
             file.mv(config.photoDir + filename, function(err){
                 if(err){
                     console.log(err);
