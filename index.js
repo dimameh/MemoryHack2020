@@ -28,21 +28,15 @@ app.get('/', async (req, res) => {
         res.send(object);
     } catch (e) {
         res.status(404);
-        res.send('File not found!');
+        res.json({status: 'error', error: 'File not found!'});
     }
 });
 
 app.post('/uploadPhoto', function(req, res) {
-    console.log('------------------------------------');
-    console.log('------------------------------------');
-    console.log('------------------------------------');
-    console.log({req: req});
-    console.log('------------------------------------');
-    console.log('------------------------------------');
-    console.log('------------------------------------');
     if (req.files) {
         if (!validator.isValidPhotoInfoData(req.body)) {
-            res.send('Data is not valid');
+            res.status(500);
+            res.json({status: 'error', error: 'data is not valid'});
         } else {
             var file = req.files.filename;
             var filename = translit().transform(nameGenerator.GenerateName(file.name));
@@ -52,15 +46,18 @@ app.post('/uploadPhoto', function(req, res) {
             file.mv(config.photoDir + filename, function(err) {
                 if (err) {
                     console.log(err);
-                    res.send('error with upload photo');
+                    res.status(500);
+                    res.json({status: 'error', error: 'error with upload photo'});
                 } else {
                     try {
                         data = req.body;
                         data.photoName = filename;
                         photoInfoController.addPhotoInfo(data);
-                        res.send(`Success! filePath: [${data}]`);
+                        res.status(201);
+                        res.json({status: 'success', filePath: `${data}`});
                     } catch (err) {
-                        res.send('db error- ' + err);
+                        res.status(500);
+                        res.json({status: 'error', error: 'db error- ' + err});
                     }                
                 }
             });
@@ -74,15 +71,18 @@ app.get('/getPhoto',function(req, res) {
         result.forEach(element => {
             element.photoName = fullUrl + '/photo/' + element.photoName
         });
-        res.send(result);
+        res.status(200);
+        res.json(result);
     })
 });
 
 app.get('/test', function(req, res) {
+    res.status(200);
     res.sendFile(__dirname + '/front/index.html');
 });
 
 app.get('/photo/:filename', function(req, res) {
+    res.status(200);
     res.sendFile(__dirname + config.photoDir.substr(1, config.photoDir.length) + req.params.filename);
 });
 
@@ -92,7 +92,8 @@ app.get('/getUserPhoto', function(req, res) {
         result.forEach(element => {
             element.photoName = fullUrl + '/photo/' + element.photoName
         });
-        res.send(result);
+        res.status(200);
+        res.json(result);
     })
 });
 
@@ -103,13 +104,15 @@ app.get('/removePhoto', function(rea, res) {
     fs.readdir(directory, (err, files) => {
         if (err) {
             console.log(err);
-            res.send(err);
+            res.status(500);
+            res.json({status: 'error', error: error});
         } else {
             for (const file of files) {
                 fs.unlink(path.join(directory, file), err => {
                     if (err) {
                         console.log(err);
-                        res.send(err);
+                        res.status(500);
+                        res.json({status: 'error', error: error});
                     }
                 });
             }
@@ -117,7 +120,8 @@ app.get('/removePhoto', function(rea, res) {
     });
     photoInfoController.removeAll();
     console.log('all photo has been removed');
-    res.send('all photo has been removed');
+    res.status(200);
+    res.json({status: 'success', error: 'all photo has been removed'});
 });
 
 //request.post({url:'http://service.com/upload', form: {key:'value'}}, function(err,httpResponse,body){ /* ... */ })
