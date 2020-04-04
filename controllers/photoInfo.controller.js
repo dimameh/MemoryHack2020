@@ -14,8 +14,12 @@ controller.addPhoto = async (photoName) => {
     }
   };
 
-controller.getPhotos = async function() {
+controller.getPhotos = async function () {
     return await PhotoInfo.getPhotos();
+}
+
+controller.removeAll = async function () {
+    await PhotoInfo.removeAll();
 }
 
 exports.controller = controller;

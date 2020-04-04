@@ -10,4 +10,6 @@ PhotoModel.addPhoto = (photoToAdd) => photoToAdd.save();
 
 PhotoModel.getPhotos = () => PhotoModel.find({ }, '-__v -_id');
 
+PhotoModel.removeAll = () => PhotoModel.remove({});
+
 exports.photoModel = PhotoModel;

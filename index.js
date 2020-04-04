@@ -7,6 +7,7 @@ const fs = require('fs'),
     upload = require('express-fileupload');
     photoController = require('./controllers/photoInfo.controller').controller,
     nameGenerator = require('./photoNameGenerator');
+    path = require('path');
 
 
 app.use('/public', express.static(__dirname + '/public'));  
@@ -43,9 +44,8 @@ app.post('/uploadPhoto', function(req, res) {
                     res.send('error with upload photo');
                 } else {
                     try {
-                        const url = filename;
-                        photoController.addPhoto(url);
-                        res.send(`Success! filePath: [${url}]`);
+                        photoController.addPhoto(filename);
+                        res.send(`Success! filePath: [${filename}]`);
                     } catch (err) {
                         res.send('db error- ' + err);
                     }                
@@ -71,6 +71,28 @@ app.get('/test', function(req, res) {
 
 app.get('/photo/:name', function(req, res) {
     res.sendFile(__dirname + config.photoDir.substr(1, config.photoDir.length) + req.params.name);
+});
+
+//Требуется для дебага
+app.get('/clearPhotos', function(rea, res) {
+    const directory = 'photos';
+
+    fs.readdir(directory, (err, files) => {
+        if (err) {
+            console.log(err);
+        } else {
+            for (const file of files) {
+                fs.unlink(path.join(directory, file), err => {
+                    if (err) {
+                        console.log(err);
+                    }
+                });
+            }
+        }
+    });
+    photoController.removeAll();
+    console.log('all photo has been removed');
+    res.send('all photo has been removed');
 });
 
 //request.post({url:'http://service.com/upload', form: {key:'value'}}, function(err,httpResponse,body){ /* ... */ })
