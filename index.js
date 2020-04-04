@@ -35,8 +35,7 @@ app.get('/', async (req, res) => {
 app.post('/uploadPhoto', function(req, res) {
     if (req.files) {
         if (!validator.isValidPhotoInfoData(req.body)) {
-            res.send('Data is not valid: ');
-            console.log(req.body);
+            res.send('Data is not valid');
         } else {
             var file = req.files.filename;
             var filename = nameGenerator.GenerateName(file.name);
@@ -52,7 +51,6 @@ app.post('/uploadPhoto', function(req, res) {
                     try {
                         data = req.body;
                         data.photoName = filename;
-                        console.log(data);
                         photoInfoController.addPhotoInfo(data);
                         res.send(`Success! filePath: [${data}]`);
                     } catch (err) {
@@ -69,7 +67,7 @@ app.get('/getPhoto',function(req, res) {
     fullUrl = fullUrl.substr(0, fullUrl.length - 9);
     photoInfoController.getPhotoInfo().then(result => {
         result.forEach(element => {
-            element.photoName = fullUrl + 'photo/' + element.photoName
+            element.photoName = fullUrl + '/photo/' + element.photoName
         });
         res.send(result);
     })
@@ -79,8 +77,8 @@ app.get('/test', function(req, res) {
     res.sendFile(__dirname + '/front/index.html');
 });
 
-app.get('/photo/:name', function(req, res) {
-    res.sendFile(__dirname + config.photoDir.substr(1, config.photoDir.length) + req.params.name);
+app.get('/photo/:filename', function(req, res) {
+    res.sendFile(__dirname + config.photoDir.substr(1, config.photoDir.length) + req.params.filename);
 });
 
 app.get('/getUserPhoto', function(req, res) {
@@ -102,11 +100,13 @@ app.get('/removePhoto', function(rea, res) {
     fs.readdir(directory, (err, files) => {
         if (err) {
             console.log(err);
+            res.send(err);
         } else {
             for (const file of files) {
                 fs.unlink(path.join(directory, file), err => {
                     if (err) {
                         console.log(err);
+                        res.send(err);
                     }
                 });
             }

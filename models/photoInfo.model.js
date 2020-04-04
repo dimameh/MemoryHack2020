@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const PhotoInfoSchema = mongoose.Schema({
   photoName: { type: String, required: true, unique: true },
-  vkUserId: { type: Number, required: true },
+  vkUserId: { type: String, required: true },
   name: { type: String, required: true },
   surname: { type: String, required: true },
   birthYear: { type: Number },
