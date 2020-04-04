@@ -39,7 +39,6 @@ app.post('/uploadPhoto', function(req, res) {
         } else {
             var file = req.files.filename;
             var filename = nameGenerator.GenerateName(file.name);
-            var userId = req.body.vkUserId;
             if (!fs.existsSync(config.photoDir)) {
                 fs.mkdirSync(config.photoDir);
             }
@@ -63,8 +62,7 @@ app.post('/uploadPhoto', function(req, res) {
 });
 
 app.get('/getPhoto',function(req, res) {
-    var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
-    fullUrl = fullUrl.substr(0, fullUrl.length - 9);
+    var fullUrl = req.protocol + '://' + req.get('host');
     photoInfoController.getPhotoInfo().then(result => {
         result.forEach(element => {
             element.photoName = fullUrl + '/photo/' + element.photoName
@@ -82,12 +80,10 @@ app.get('/photo/:filename', function(req, res) {
 });
 
 app.get('/getUserPhoto', function(req, res) {
-    var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
-
-    fullUrl = fullUrl.substr(0, fullUrl.length - 9);
-    photoInfoController.getUsersPhoto(req.body.vkUserId).then(result => {
+    var fullUrl = req.protocol + '://' + req.get('host');
+    photoInfoController.getUsersPhoto(req.query.vkUserId).then(result => {
         result.forEach(element => {
-            element.photoName = fullUrl + 'photo/' + element.photoName
+            element.photoName = fullUrl + '/photo/' + element.photoName
         });
         res.send(result);
     })
