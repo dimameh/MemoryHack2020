@@ -1,5 +1,4 @@
 const fs = require('fs'),
-    fileUrl = require('file-url'),
     request = require('request'),
     express = require('express'),
     app = express(),
@@ -44,7 +43,7 @@ app.post('/uploadPhoto', function(req, res) {
                     res.send('error with upload photo');
                 } else {
                     try {
-                        const url = fileUrl(config.photoDir + filename);
+                        const url = filename;
                         photoController.addPhoto(url);
                         res.send(`Success! filePath: [${url}]`);
                     } catch (err) {
@@ -56,13 +55,22 @@ app.post('/uploadPhoto', function(req, res) {
 });
 
 app.get('/getPhotos',function(req, res) {
+    var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+    fullUrl = fullUrl.substr(0, fullUrl.length - 9);
     photoController.getPhotos().then(result => {
+        result.forEach(element => {
+            element.photoName = fullUrl + 'photo/' + element.photoName
+        });
         res.send(result);
     })
 });
 
 app.get('/test', function(req, res) {
     res.sendFile(__dirname + '/front/index.html');
+});
+
+app.get('/photo/:name', function(req, res) {
+    res.sendFile(__dirname + config.photoDir.substr(1, config.photoDir.length) + req.params.name);
 });
 
 //request.post({url:'http://service.com/upload', form: {key:'value'}}, function(err,httpResponse,body){ /* ... */ })

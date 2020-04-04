@@ -2,9 +2,9 @@ const PhotoInfo = require('../models/photoInfo.model').photoModel;
 
 const controller = {};
 
-controller.addPhoto = async (photoPath) => {
+controller.addPhoto = async (photoName) => {
     const photoToAdd = PhotoInfo({
-        photoPath
+        photoName
     });
     try {
         await PhotoInfo.addPhoto(photoToAdd);

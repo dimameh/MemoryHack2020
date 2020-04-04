@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const PhotoSchema = mongoose.Schema({
-  photoPath: { type: String, required: true, unique: true },
+  photoName: { type: String, required: true, unique: true },
 }, { collection: 'photos' });
 
 const PhotoModel = mongoose.model('photos', PhotoSchema);
