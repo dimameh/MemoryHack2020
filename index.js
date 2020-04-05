@@ -14,6 +14,11 @@ const fs = require('fs'),
 app.use('/public', express.static(__dirname + '/public'));  
 app.use(express.static(__dirname + '/public')); 
 app.use(upload());
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
 
 app.listen(config.serverPort, function () {
   console.log('Listening on port ' + config.serverPort);
@@ -54,8 +59,7 @@ app.post('/uploadPhoto', function(req, res) {
                         data.photoName = filename;
                         photoInfoController.addPhotoInfo(data);
                         res.status(201);
-                        var resultUrl = generateLink(data.photoName, req);
-                        res.json({ status: 'success', filePath: resultUrl });
+                        res.json({ status: 'success', filePath: `${data}` });
                     } catch (err) {
                         res.status(500);
                         res.json({ status: 'error', error: 'db error- ' + err });
@@ -159,8 +163,6 @@ app.get('/processPhoto', function(req, res) {
                             res.status(500);
                             res.json({ status: 'error', error: 'error with deleting file- ' + err });
                         }
-                        res.status(201);
-                        res.json({ status: 'success', filePath: `${data}` });
                     } catch (err) {
                         res.status(500);
                         res.json({ status: 'error', error: 'db error- ' + err });
@@ -186,12 +188,6 @@ app.get('/processPhoto', function(req, res) {
                 console.log('Upload successful!  Server responded with:', body);
             });
 });
-
-function generateLink(photoName, req) {
-    var fullUrl = req.protocol + '://' + req.get('host');
-    var result = fullUrl + config.photoDir.substr(1, config.photoDir.length) + photoName
-    return result;
-}
 
 //request.post({url:'http://service.com/upload', form: {key:'value'}}, function(err,httpResponse,body){ /* ... */ })
 
