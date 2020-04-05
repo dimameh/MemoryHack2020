@@ -127,62 +127,48 @@ app.get('/removePhoto', function(req, res) {
     res.json({status: 'success', error: 'all photo has been removed'});
 });
 
-app.get('/processPhoto', function(req, res) {
-
+app.post('/processPhoto', function(req, res) {
     var file = req.files.filename;
-            var filename = translit().transform(nameGenerator.GenerateName(file.name));
-            if (!fs.existsSync(config.processPhotoDir)) {
-                fs.mkdirSync(config.processPhotoDir);
-            }
-            file.mv(config.processPhotoDir + filename, function(err) {
-                if (err) {
-                    console.log(err);
+    var filename = translit().transform(nameGenerator.GenerateName(file.name));
+    if (!fs.existsSync(config.processPhotoDir)) {
+        fs.mkdirSync(config.processPhotoDir);
+    }
+    file.mv(config.processPhotoDir + filename, function(err) {
+        if (err) {
+            console.log(err);
+            res.status(500);
+            res.json({ status: 'error', error: 'error with upload photo' });
+        } else {
+            try {
+                var fullUrl = req.protocol + '://' + req.get('host');
+                const url = fullUrl + config.processPhotoDir.substr(1,config.processPhotoDir.length) + filename;
+                const body = { url, sex: req.body.sex };
+                //посылаем запрос на нейронку
+                request.post('http://170ec337.ngrok.io/upload?url=' + url, function optionalCallback(err, httpResponse, body) {
+                    if (err) {
+                        return console.error('upload failed:', err);
+                    }
+                    console.log('SUCCESS RESPONSE', body);
+                    res.json(body);
+                });
+                
+                //получаем ответ, отсылаем его в res
+                
+                //Удаляем файл
+                try {
+                    var filePath = config.processPhotoDir + filename;
+                    fs.unlinkSync(filePath);
+                } catch(err) {
+                    console.error('error with deleting file- ' + err);
                     res.status(500);
-                    res.json({ status: 'error', error: 'error with upload photo' });
-                } else {
-                    try {
-                        var fullUrl = req.protocol + '://' + req.get('host');
-                        const url = fullUrl + config.processPhotoDir.substr(1,config.processPhotoDir.length) + filename;
-                        const body = { url, sex: req.body.sex };
-
-                        //посылаем запрос на нейронку
-                        //получаем ответ, отсылаем его в res
-                        
-
-                        
-                        //Удаляем файл
-                        try {
-                            var filePath = config.processPhotoDir + filename;
-                            fs.unlinkSync(filePath);
-                        } catch(err) {
-                            console.error('error with deleting file- ' + err);
-                            res.status(500);
-                            res.json({ status: 'error', error: 'error with deleting file- ' + err });
-                        }
-                    } catch (err) {
-                        res.status(500);
-                        res.json({ status: 'error', error: 'db error- ' + err });
-                    }                
+                    res.json({ status: 'error', error: 'error with deleting file- ' + err });
                 }
-            });
-            const formData = {
-                // Pass a simple key-value pair
-                sex: req.body.sex,
-                // Pass data via Buffers
-                my_buffer: Buffer.from([1, 2, 3]),
-                // Pass data via Streams
-                my_file: fs.createReadStream(__dirname + '/unicycle.jpg'),
-            
-              };
-          
-          
-          
-            request.post({ url:'http://service.com/upload', formData: formData }, function optionalCallback(err, httpResponse, body) {
-                if (err) {
-                    return console.error('upload failed:', err);
-                }
-                console.log('Upload successful!  Server responded with:', body);
-            });
+            } catch (err) {
+                res.status(500);
+                res.json({ status: 'error', error: 'db error- ' + err });
+            }                
+        }
+    });
 });
 
 function generateLink(photoName, req) {
