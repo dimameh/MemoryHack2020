@@ -175,8 +175,8 @@ app.post('/processPhoto', function(req, res) {
                     uri: 'http://170ec337.ngrok.io/upload',
                     body: resultUrl,
                     method: 'POST'
-                  }, function (err, res, body) {
-                    res.json(body);
+                  }, function (err, result, body) {
+                    res.json(result);
                   });
                 // request.post('http://170ec337.ngrok.io/upload?url=' + resultUrl, function optionalCallback(err, httpResponse, body) {
                 //     if (err) {
