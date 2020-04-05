@@ -152,6 +152,7 @@ app.get('/removePhoto', function(req, res) {
 });
 
 app.post('/processPhoto', function(req, res) {
+    console.log(req);
     if (req.files) {
 
         var file = req.files.filename;
