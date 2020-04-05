@@ -164,16 +164,27 @@ app.post('/processPhoto', function(req, res) {
                 res.json({ status: 'error', error: 'error with upload photo' });
             } else {                
                 var resultUrl = generateProcessLink(filename, req);
-                //const body = { url, sex: req.body.sex };
+                const body = { url, sex: req.body.sex };
                 //посылаем запрос на нейронку
                 console.log({resultUrl: resultUrl});
-                request.post('http://170ec337.ngrok.io/upload?url=' + resultUrl, function optionalCallback(err, httpResponse, body) {
-                    if (err) {
-                        return console.error('upload failed:', err);
-                    }
-                    //console.log('SUCCESS RESPONSE', body);
+                request({
+                    headers: {
+                      'Content-Length': Buffer.byteLength(body),
+                      'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    uri: 'http://170ec337.ngrok.io/upload',
+                    body: body,
+                    method: 'POST'
+                  }, function (err, res, body) {
                     res.json(body);
-                });
+                  });
+                // request.post('http://170ec337.ngrok.io/upload?url=' + resultUrl, function optionalCallback(err, httpResponse, body) {
+                //     if (err) {
+                //         return console.error('upload failed:', err);
+                //     }
+                //     //console.log('SUCCESS RESPONSE', body);
+                //     res.json(body);
+                // });
             }
         })
         
