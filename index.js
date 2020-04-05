@@ -14,11 +14,6 @@ const fs = require('fs'),
 app.use('/public', express.static(__dirname + '/public'));  
 app.use(express.static(__dirname + '/public')); 
 app.use(upload());
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  next();
-});
 
 app.listen(config.serverPort, function () {
   console.log('Listening on port ' + config.serverPort);
@@ -190,4 +185,3 @@ app.get('/processPhoto', function(req, res) {
 });
 
 //request.post({url:'http://service.com/upload', form: {key:'value'}}, function(err,httpResponse,body){ /* ... */ })
-
