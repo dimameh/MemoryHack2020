@@ -71,6 +71,7 @@ app.get('/getPhoto',function(req, res) {
         result.forEach(element => {
             element.photoName = fullUrl + '/photo/' + element.photoName
         });
+        result.reverse();
         res.status(200);
         res.json(result);
     })
@@ -92,6 +93,7 @@ app.get('/getUserPhoto', function(req, res) {
         result.forEach(element => {
             element.photoName = fullUrl + '/photo/' + element.photoName
         });
+        result.reverse();
         res.status(200);
         res.json(result);
     })
