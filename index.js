@@ -63,6 +63,8 @@ app.post('/uploadPhoto', function(req, res) {
                 }
             });
         }
+    } else {
+        res.json({ status: 'error', error: 'No files' });
     }
 });
 
@@ -182,85 +184,12 @@ app.post('/processPhoto', function(req, res) {
                 
                   res.json({status: 'success', result: JSON.parse(body)});
                 });
-
-
-
-                //////////////////////////
-                // //посылаем запрос на нейронку
-                // console.log({resultUrl: resultUrl});
-                // request({
-                //     headers: {
-                //       'Content-Length': Buffer.byteLength(resultUrl),
-                //       'Content-Type': 'application/x-www-form-urlencoded'
-                //     },
-                //     uri: 'http://170ec337.ngrok.io/upload',
-                //     body: resultUrl,
-                //     method: 'POST'
-                //   }, function (err, result, body) {
-                //     res.json(result);
-                //   });
-
-
-
-
-
-  ///////////////////////////////////
-                // request.post('http://170ec337.ngrok.io/upload?url=' + resultUrl, function optionalCallback(err, httpResponse, body) {
-                //     if (err) {
-                //         return console.error('upload failed:', err);
-                //     }
-                //     //console.log('SUCCESS RESPONSE', body);
-                //     res.json(body);
-                // });
             }
         })
         
+    } else {
+        res.json({ status: 'error', error: 'No files' });
     }
-
-
-    // var file = req.files.filename;
-    // var filename = translit().transform(nameGenerator.GenerateName(file.name));
-    // if (!fs.existsSync(config.processPhotoDir)) {
-    //     fs.mkdirSync(config.processPhotoDir);
-    // }
-    // file.mv(config.processPhotoDir + filename, function(err) {
-    //     if (err) {
-    //         console.log(err);
-    //         res.status(500);
-    //         res.json({ status: 'error', error: 'error with upload photo' });
-    //     } else {
-    //         try {
-                
-    //             var fullUrl = req.protocol + '://' + req.get('host');
-    //             const url = fullUrl + config.processPhotoDir.substr(1,config.processPhotoDir.length) + filename;
-    //             const body = { url, sex: req.body.sex };
-    //             res.send(url);
-    //             //посылаем запрос на нейронку
-    //             // request.post('http://170ec337.ngrok.io/upload?url=' + url, function optionalCallback(err, httpResponse, body) {
-    //             //     if (err) {
-    //             //         return console.error('upload failed:', err);
-    //             //     }
-    //             //     console.log('SUCCESS RESPONSE', body);
-    //             //     res.json(body);
-    //             // });
-                
-    //             //получаем ответ, отсылаем его в res
-                
-    //             //Удаляем файл
-    //             try {
-    //                 var filePath = config.processPhotoDir + filename;
-    //                 fs.unlinkSync(filePath);
-    //             } catch(err) {
-    //                 console.error('error with deleting file- ' + err);
-    //                 res.status(500);
-    //                 res.json({ status: 'error', error: 'error with deleting file- ' + err });
-    //             }
-    //         } catch (err) {
-    //             res.status(500);
-    //             res.json({ status: 'error', error: 'db error- ' + err });
-    //         }                
-    //     }
-    // });
 });
 
 function generateLink(photoName, req) {
