@@ -180,7 +180,7 @@ app.post('/processPhoto', function(req, res) {
                 request(options, function (error, response, body) {
                   if (error) throw new Error(error);
                 
-                  res.json({status: 'success', result: body});
+                  res.json({status: 'success', result: JSON.parse(body)});
                 });
 
 
