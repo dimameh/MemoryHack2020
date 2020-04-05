@@ -9,8 +9,10 @@ const fs = require('fs'),
     nameGenerator = require('./photoNameGenerator'),
     path = require('path'),
     validator = require('./validator'),
-    translit = require('cyrillic-to-translit-js');
-
+    translit = require('cyrillic-to-translit-js'),
+    cors = require('cors');
+    
+app.use(cors());
 app.use('/public', express.static(__dirname + '/public'));  
 app.use(express.static(__dirname + '/public')); 
 app.use(upload());
