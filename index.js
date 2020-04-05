@@ -88,6 +88,11 @@ app.get('/photo/:filename', function(req, res) {
     res.sendFile(__dirname + config.photoDir.substr(1, config.photoDir.length) + req.params.filename);
 });
 
+app.get('/processPhoto/:filename', function(req, res) {
+    res.status(200);
+    res.sendFile(__dirname + config.processPhotoDir.substr(1, config.processPhotoDir.length) + req.params.filename);
+});
+
 app.get('/getUserPhoto', function(req, res) {
     var fullUrl = req.protocol + '://' + req.get('host');
     photoInfoController.getUsersPhoto(req.query.vkUserId).then(result => {
@@ -128,33 +133,30 @@ app.get('/removePhoto', function(req, res) {
 });
 
 app.post('/processPhoto', function(req, res) {
-    var file = req.files.filename;
-    var filename = translit().transform(nameGenerator.GenerateName(file.name));
-    if (!fs.existsSync(config.processPhotoDir)) {
-        fs.mkdirSync(config.processPhotoDir);
-    }
-    file.mv(config.processPhotoDir + filename, function(err) {
-        if (err) {
-            console.log(err);
-            res.status(500);
-            res.json({ status: 'error', error: 'error with upload photo' });
-        } else {
-            try {
-                var fullUrl = req.protocol + '://' + req.get('host');
-                const url = fullUrl + config.processPhotoDir.substr(1,config.processPhotoDir.length) + filename;
-                const body = { url, sex: req.body.sex };
+    if (req.files) {
+
+        var file = req.files.filename;
+        var filename = translit().transform(nameGenerator.GenerateName(file.name));
+        if (!fs.existsSync(config.photoDir)) {
+            fs.mkdirSync(config.photoDir);
+        }
+        file.mv(config.processPhotoDir + filename, function(err) {
+            if (err) {
+                console.log(err);
+                res.status(500);
+                res.json({ status: 'error', error: 'error with upload photo' });
+            } else {                
+                var resultUrl = generateProcessLink(filename, req);
+                //const body = { url, sex: req.body.sex };
                 //посылаем запрос на нейронку
-                request.post('http://170ec337.ngrok.io/upload?url=' + url, function optionalCallback(err, httpResponse, body) {
+
+                request.post('http://170ec337.ngrok.io/upload?url=' + resultUrl, function optionalCallback(err, httpResponse, body) {
                     if (err) {
                         return console.error('upload failed:', err);
                     }
                     console.log('SUCCESS RESPONSE', body);
                     res.json(body);
                 });
-                
-                //получаем ответ, отсылаем его в res
-                
-                //Удаляем файл
                 try {
                     var filePath = config.processPhotoDir + filename;
                     fs.unlinkSync(filePath);
@@ -163,12 +165,55 @@ app.post('/processPhoto', function(req, res) {
                     res.status(500);
                     res.json({ status: 'error', error: 'error with deleting file- ' + err });
                 }
-            } catch (err) {
-                res.status(500);
-                res.json({ status: 'error', error: 'db error- ' + err });
-            }                
-        }
-    });
+            }
+        })
+        
+    }
+
+
+    // var file = req.files.filename;
+    // var filename = translit().transform(nameGenerator.GenerateName(file.name));
+    // if (!fs.existsSync(config.processPhotoDir)) {
+    //     fs.mkdirSync(config.processPhotoDir);
+    // }
+    // file.mv(config.processPhotoDir + filename, function(err) {
+    //     if (err) {
+    //         console.log(err);
+    //         res.status(500);
+    //         res.json({ status: 'error', error: 'error with upload photo' });
+    //     } else {
+    //         try {
+                
+    //             var fullUrl = req.protocol + '://' + req.get('host');
+    //             const url = fullUrl + config.processPhotoDir.substr(1,config.processPhotoDir.length) + filename;
+    //             const body = { url, sex: req.body.sex };
+    //             res.send(url);
+    //             //посылаем запрос на нейронку
+    //             // request.post('http://170ec337.ngrok.io/upload?url=' + url, function optionalCallback(err, httpResponse, body) {
+    //             //     if (err) {
+    //             //         return console.error('upload failed:', err);
+    //             //     }
+    //             //     console.log('SUCCESS RESPONSE', body);
+    //             //     res.json(body);
+    //             // });
+                
+    //             //получаем ответ, отсылаем его в res
+                
+    //             //Удаляем файл
+    //             try {
+    //                 var filePath = config.processPhotoDir + filename;
+    //                 fs.unlinkSync(filePath);
+    //             } catch(err) {
+    //                 console.error('error with deleting file- ' + err);
+    //                 res.status(500);
+    //                 res.json({ status: 'error', error: 'error with deleting file- ' + err });
+    //             }
+    //         } catch (err) {
+    //             res.status(500);
+    //             res.json({ status: 'error', error: 'db error- ' + err });
+    //         }                
+    //     }
+    // });
 });
 
 function generateLink(photoName, req) {
@@ -177,5 +222,10 @@ function generateLink(photoName, req) {
     return result;
 }
 
-//request.post({url:'http://service.com/upload', form: {key:'value'}}, function(err,httpResponse,body){ /* ... */ })
+function generateProcessLink(photoName, req) {
+    var fullUrl = req.protocol + '://' + req.get('host');
+    var result = fullUrl + config.processPhotoDir.substr(1, config.processPhotoDir.length) + photoName
+    return result;
+}
 
+//request.post({url:'http://service.com/upload', form: {key:'value'}}, function(err,httpResponse,body){ /* ... */ })
