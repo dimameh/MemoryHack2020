@@ -9,17 +9,8 @@ const fs = require('fs'),
     nameGenerator = require('./photoNameGenerator'),
     path = require('path'),
     validator = require('./validator'),
-    translit = require('cyrillic-to-translit-js'),
-    cors = require('cors');
+    translit = require('cyrillic-to-translit-js');
 
-connect.connectToDb();
-
-// app.use(function (req, res, next) {
-//     res.header("Access-Control-Allow-Origin", "*");
-//     res.header("Access-Control-Allow-Methods", "GET, PUT, PATCH, POST, DELETE");
-//     res.header("Access-Control-Allow-Headers", "Content-Type");
-//     next();
-// });
 app.use('/public', express.static(__dirname + '/public'));  
 app.use(express.static(__dirname + '/public')); 
 app.use(upload());
@@ -28,7 +19,7 @@ app.listen(config.serverPort, function () {
   console.log('Listening on port ' + config.serverPort);
 });
 
-app.options('*', function(req,res,next){ res.sendStatus(200); });
+connect.connectToDb();
 
 app.get('/', async (req, res) => {
     try {
@@ -62,14 +53,9 @@ app.post('/uploadPhoto', function(req, res) {
                         data = req.body;
                         data.photoName = filename;
                         photoInfoController.addPhotoInfo(data);
-//////////////////////
-                        var fullUrl = req.protocol + '://' + req.get('host');
-                        resultUrl = fullUrl + config.photoDir.substr(1, config.photoDir.length) + data.photoName
                         res.status(201);
-                        res.json({status: 'success', result: resultUrl});
-                        ///////////
-                        // res.status(201);
-                        // res.json({ status: 'success', filePath: `${data}` });
+                        var resultUrl = generateLink(data.photoName, req);
+                        res.json({ status: 'success', filePath: resultUrl });
                     } catch (err) {
                         res.status(500);
                         res.json({ status: 'error', error: 'db error- ' + err });
@@ -173,6 +159,8 @@ app.get('/processPhoto', function(req, res) {
                             res.status(500);
                             res.json({ status: 'error', error: 'error with deleting file- ' + err });
                         }
+                        res.status(201);
+                        res.json({ status: 'success', filePath: `${data}` });
                     } catch (err) {
                         res.status(500);
                         res.json({ status: 'error', error: 'db error- ' + err });
@@ -199,20 +187,11 @@ app.get('/processPhoto', function(req, res) {
             });
 });
 
-//request.post({url:'http://service.com/upload', form: {key:'value'}}, function(err,httpResponse,body){ /* ... */ })
+function generateLink(photoName, req) {
+    var fullUrl = req.protocol + '://' + req.get('host');
+    var result = fullUrl + config.photoDir.substr(1, config.photoDir.length) + photoName
+    return result;
+}
 
-// var headersOpt = {  
-//     "content-type": "application/json",
-// };
-// request(
-//         {
-//         method:'post',
-//         url:'https://www.googleapis.com/urlshortener/v1/url', 
-//         form: {name:'hello',age:25}, 
-//         headers: headersOpt,
-//         json: true,
-//     }, function (error, response, body) {  
-//         //Print the Response
-//         console.log(body);  
-// }); 
+//request.post({url:'http://service.com/upload', form: {key:'value'}}, function(err,httpResponse,body){ /* ... */ })
 
