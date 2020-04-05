@@ -11,22 +11,22 @@ const fs = require('fs'),
     validator = require('./validator'),
     translit = require('cyrillic-to-translit-js'),
     cors = require('cors');
-    
+
+connect.connectToDb();
+
 app.use(cors());
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    next();
+  });
 app.use('/public', express.static(__dirname + '/public'));  
 app.use(express.static(__dirname + '/public')); 
 app.use(upload());
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  next();
-});
 
 app.listen(config.serverPort, function () {
   console.log('Listening on port ' + config.serverPort);
 });
-
-connect.connectToDb();
 
 app.get('/', async (req, res) => {
     try {
