@@ -15,12 +15,12 @@ const fs = require('fs'),
 connect.connectToDb();
 
 app.use(cors());
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    next();
-  });
+// app.use((req, res, next) => {
+//     res.header('Access-Control-Allow-Origin', '*');
+//     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+//     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+//     next();
+//   });
 app.use('/public', express.static(__dirname + '/public'));  
 app.use(express.static(__dirname + '/public')); 
 app.use(upload());
@@ -28,6 +28,8 @@ app.use(upload());
 app.listen(config.serverPort, function () {
   console.log('Listening on port ' + config.serverPort);
 });
+
+app.options('*', function(req,res,next){ res.sendStatus(200); });
 
 app.get('/', async (req, res) => {
     try {
@@ -193,4 +195,19 @@ app.get('/processPhoto', function(req, res) {
 });
 
 //request.post({url:'http://service.com/upload', form: {key:'value'}}, function(err,httpResponse,body){ /* ... */ })
+
+// var headersOpt = {  
+//     "content-type": "application/json",
+// };
+// request(
+//         {
+//         method:'post',
+//         url:'https://www.googleapis.com/urlshortener/v1/url', 
+//         form: {name:'hello',age:25}, 
+//         headers: headersOpt,
+//         json: true,
+//     }, function (error, response, body) {  
+//         //Print the Response
+//         console.log(body);  
+// }); 
 
