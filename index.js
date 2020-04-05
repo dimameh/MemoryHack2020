@@ -62,8 +62,14 @@ app.post('/uploadPhoto', function(req, res) {
                         data = req.body;
                         data.photoName = filename;
                         photoInfoController.addPhotoInfo(data);
-                        res.status(201);
-                        res.json({ status: 'success', filePath: `${data}` });
+//////////////////////
+                        var fullUrl = req.protocol + '://' + req.get('host');
+                        resultUrl = fullUrl + config.photoDir.substr(1, config.photoDir.length) + data.photoName
+                        res.status(200);
+                        res.json(resultUrl);
+                        ///////////
+                        // res.status(201);
+                        // res.json({ status: 'success', filePath: `${data}` });
                     } catch (err) {
                         res.status(500);
                         res.json({ status: 'error', error: 'db error- ' + err });
