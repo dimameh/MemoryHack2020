@@ -165,19 +165,46 @@ app.post('/processPhoto', function(req, res) {
             } else {                
                 var resultUrl = generateProcessLink(filename, req);
                 const body = { url: resultUrl, sex: req.body.sex };
-                //посылаем запрос на нейронку
-                console.log({resultUrl: resultUrl});
-                request({
-                    headers: {
-                      'Content-Length': Buffer.byteLength(resultUrl),
-                      'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    uri: 'http://170ec337.ngrok.io/upload',
-                    body: resultUrl,
-                    method: 'POST'
-                  }, function (err, result, body) {
-                    res.json(result);
-                  });
+
+
+                var options = { method: 'POST',
+                  url: 'http://170ec337.ngrok.io/upload',
+                  headers: 
+                   { 'Postman-Token': '92294eda-ae91-43bb-b368-b50c8f031859',
+                     'cache-control': 'no-cache',
+                     'Content-Type': 'application/x-www-form-urlencoded' },
+                  form: 
+                   { url: resultUrl,
+                     undefined: undefined } };
+                
+                request(options, function (error, response, body) {
+                  if (error) throw new Error(error);
+                
+                  console.log(body);
+                });
+
+
+
+                //////////////////////////
+                // //посылаем запрос на нейронку
+                // console.log({resultUrl: resultUrl});
+                // request({
+                //     headers: {
+                //       'Content-Length': Buffer.byteLength(resultUrl),
+                //       'Content-Type': 'application/x-www-form-urlencoded'
+                //     },
+                //     uri: 'http://170ec337.ngrok.io/upload',
+                //     body: resultUrl,
+                //     method: 'POST'
+                //   }, function (err, result, body) {
+                //     res.json(result);
+                //   });
+
+
+
+
+
+  ///////////////////////////////////
                 // request.post('http://170ec337.ngrok.io/upload?url=' + resultUrl, function optionalCallback(err, httpResponse, body) {
                 //     if (err) {
                 //         return console.error('upload failed:', err);
