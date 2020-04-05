@@ -166,12 +166,12 @@ app.post('/processPhoto', function(req, res) {
                 var resultUrl = generateProcessLink(filename, req);
                 //const body = { url, sex: req.body.sex };
                 //посылаем запрос на нейронку
-
+                console.log({resultUrl: resultUrl});
                 request.post('http://170ec337.ngrok.io/upload?url=' + resultUrl, function optionalCallback(err, httpResponse, body) {
                     if (err) {
                         return console.error('upload failed:', err);
                     }
-                    console.log('SUCCESS RESPONSE', body);
+                    //console.log('SUCCESS RESPONSE', body);
                     res.json(body);
                 });
                 try {
