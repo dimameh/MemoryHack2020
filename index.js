@@ -154,8 +154,8 @@ app.post('/processPhoto', function(req, res) {
 
         var file = req.files.filename;
         var filename = translit().transform(nameGenerator.GenerateName(file.name));
-        if (!fs.existsSync(config.photoDir)) {
-            fs.mkdirSync(config.photoDir);
+        if (!fs.existsSync(config.processPhotoDir)) {
+            fs.mkdirSync(config.processPhotoDir);
         }
         file.mv(config.processPhotoDir + filename, function(err) {
             if (err) {
