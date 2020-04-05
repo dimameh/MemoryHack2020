@@ -108,7 +108,7 @@ app.get('/getUserPhoto', function(req, res) {
 //Требуется для дебага
 app.get('/removePhoto', function(req, res) {
     const directory = 'photo';
-
+    const secondDirectory = 'processPhoto';
     fs.readdir(directory, (err, files) => {
         if (err) {
             console.log(err);
@@ -117,6 +117,23 @@ app.get('/removePhoto', function(req, res) {
         } else {
             for (const file of files) {
                 fs.unlink(path.join(directory, file), err => {
+                    if (err) {
+                        console.log(err);
+                        res.status(500);
+                        res.json({ status: 'error', error: error });
+                    }
+                });
+            }
+        }
+    });
+    fs.readdir(secondDirectory, (err, files) => {
+        if (err) {
+            console.log(err);
+            res.status(500);
+            res.json({status: 'error', error: error});
+        } else {
+            for (const file of files) {
+                fs.unlink(path.join(secondDirectory, file), err => {
                     if (err) {
                         console.log(err);
                         res.status(500);
