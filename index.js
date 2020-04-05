@@ -174,14 +174,6 @@ app.post('/processPhoto', function(req, res) {
                     //console.log('SUCCESS RESPONSE', body);
                     res.json(body);
                 });
-                try {
-                    var filePath = config.processPhotoDir + filename;
-                    fs.unlinkSync(filePath);
-                } catch(err) {
-                    console.error('error with deleting file- ' + err);
-                    res.status(500);
-                    res.json({ status: 'error', error: 'error with deleting file- ' + err });
-                }
             }
         })
         
