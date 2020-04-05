@@ -54,7 +54,8 @@ app.post('/uploadPhoto', function(req, res) {
                         data.photoName = filename;
                         photoInfoController.addPhotoInfo(data);
                         res.status(201);
-                        res.json({ status: 'success', filePath: `${data}` });
+                        var resultUrl = generateLink(data.photoName, req);
+                        res.json({ status: 'success', filePath: resultUrl });
                     } catch (err) {
                         res.status(500);
                         res.json({ status: 'error', error: 'db error- ' + err });
@@ -184,4 +185,11 @@ app.get('/processPhoto', function(req, res) {
             });
 });
 
+function generateLink(photoName, req) {
+    var fullUrl = req.protocol + '://' + req.get('host');
+    var result = fullUrl + config.photoDir.substr(1, config.photoDir.length) + photoName
+    return result;
+}
+
 //request.post({url:'http://service.com/upload', form: {key:'value'}}, function(err,httpResponse,body){ /* ... */ })
+
