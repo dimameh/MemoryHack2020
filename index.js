@@ -65,8 +65,8 @@ app.post('/uploadPhoto', function(req, res) {
 //////////////////////
                         var fullUrl = req.protocol + '://' + req.get('host');
                         resultUrl = fullUrl + config.photoDir.substr(1, config.photoDir.length) + data.photoName
-                        res.status(200);
-                        res.json(resultUrl);
+                        res.status(201);
+                        res.json({status: 'success', result: resultUrl});
                         ///////////
                         // res.status(201);
                         // res.json({ status: 'success', filePath: `${data}` });
