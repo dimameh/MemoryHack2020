@@ -14,6 +14,11 @@ const fs = require('fs'),
 app.use('/public', express.static(__dirname + '/public'));  
 app.use(express.static(__dirname + '/public')); 
 app.use(upload());
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
 
 app.listen(config.serverPort, function () {
   console.log('Listening on port ' + config.serverPort);
@@ -28,7 +33,7 @@ app.get('/', async (req, res) => {
         res.send(object);
     } catch (e) {
         res.status(404);
-        res.json({status: 'error', error: 'File not found!'});
+        res.json({ status: 'error', error: 'File not found!' });
     }
 });
 
@@ -36,7 +41,7 @@ app.post('/uploadPhoto', function(req, res) {
     if (req.files) {
         if (!validator.isValidPhotoInfoData(req.body)) {
             res.status(500);
-            res.json({status: 'error', error: 'data is not valid'});
+            res.json({ status: 'error', error: 'data is not valid' });
         } else {
             var file = req.files.filename;
             var filename = translit().transform(nameGenerator.GenerateName(file.name));
@@ -47,17 +52,17 @@ app.post('/uploadPhoto', function(req, res) {
                 if (err) {
                     console.log(err);
                     res.status(500);
-                    res.json({status: 'error', error: 'error with upload photo'});
+                    res.json({ status: 'error', error: 'error with upload photo' });
                 } else {
                     try {
                         data = req.body;
                         data.photoName = filename;
                         photoInfoController.addPhotoInfo(data);
                         res.status(201);
-                        res.json({status: 'success', filePath: `${data}`});
+                        res.json({ status: 'success', filePath: `${data}` });
                     } catch (err) {
                         res.status(500);
-                        res.json({status: 'error', error: 'db error- ' + err});
+                        res.json({ status: 'error', error: 'db error- ' + err });
                     }                
                 }
             });
@@ -69,7 +74,7 @@ app.get('/getPhoto',function(req, res) {
     var fullUrl = req.protocol + '://' + req.get('host');
     photoInfoController.getPhotoInfo().then(result => {
         result.forEach(element => {
-            element.photoName = fullUrl + '/photo/' + element.photoName
+            element.photoName = fullUrl + config.photoDir.substr(1, config.photoDir.length) + element.photoName
         });
         result.reverse();
         res.status(200);
@@ -91,7 +96,7 @@ app.get('/getUserPhoto', function(req, res) {
     var fullUrl = req.protocol + '://' + req.get('host');
     photoInfoController.getUsersPhoto(req.query.vkUserId).then(result => {
         result.forEach(element => {
-            element.photoName = fullUrl + '/photo/' + element.photoName
+            element.photoName = fullUrl + config.photoDir.substr(1, config.photoDir.length) + element.photoName
         });
         result.reverse();
         res.status(200);
@@ -100,7 +105,7 @@ app.get('/getUserPhoto', function(req, res) {
 });
 
 //Требуется для дебага
-app.get('/removePhoto', function(rea, res) {
+app.get('/removePhoto', function(req, res) {
     const directory = 'photo';
 
     fs.readdir(directory, (err, files) => {
@@ -114,7 +119,7 @@ app.get('/removePhoto', function(rea, res) {
                     if (err) {
                         console.log(err);
                         res.status(500);
-                        res.json({status: 'error', error: error});
+                        res.json({ status: 'error', error: error });
                     }
                 });
             }
@@ -124,6 +129,64 @@ app.get('/removePhoto', function(rea, res) {
     console.log('all photo has been removed');
     res.status(200);
     res.json({status: 'success', error: 'all photo has been removed'});
+});
+
+app.get('/processPhoto', function(req, res) {
+
+    var file = req.files.filename;
+            var filename = translit().transform(nameGenerator.GenerateName(file.name));
+            if (!fs.existsSync(config.processPhotoDir)) {
+                fs.mkdirSync(config.processPhotoDir);
+            }
+            file.mv(config.processPhotoDir + filename, function(err) {
+                if (err) {
+                    console.log(err);
+                    res.status(500);
+                    res.json({ status: 'error', error: 'error with upload photo' });
+                } else {
+                    try {
+                        var fullUrl = req.protocol + '://' + req.get('host');
+                        const url = fullUrl + config.processPhotoDir.substr(1,config.processPhotoDir.length) + filename;
+                        const body = { url, sex: req.body.sex };
+
+                        //посылаем запрос на нейронку
+                        //получаем ответ, отсылаем его в res
+                        
+
+                        
+                        //Удаляем файл
+                        try {
+                            var filePath = config.processPhotoDir + filename;
+                            fs.unlinkSync(filePath);
+                        } catch(err) {
+                            console.error('error with deleting file- ' + err);
+                            res.status(500);
+                            res.json({ status: 'error', error: 'error with deleting file- ' + err });
+                        }
+                    } catch (err) {
+                        res.status(500);
+                        res.json({ status: 'error', error: 'db error- ' + err });
+                    }                
+                }
+            });
+            const formData = {
+                // Pass a simple key-value pair
+                sex: req.body.sex,
+                // Pass data via Buffers
+                my_buffer: Buffer.from([1, 2, 3]),
+                // Pass data via Streams
+                my_file: fs.createReadStream(__dirname + '/unicycle.jpg'),
+            
+              };
+          
+          
+          
+            request.post({ url:'http://service.com/upload', formData: formData }, function optionalCallback(err, httpResponse, body) {
+                if (err) {
+                    return console.error('upload failed:', err);
+                }
+                console.log('Upload successful!  Server responded with:', body);
+            });
 });
 
 //request.post({url:'http://service.com/upload', form: {key:'value'}}, function(err,httpResponse,body){ /* ... */ })
